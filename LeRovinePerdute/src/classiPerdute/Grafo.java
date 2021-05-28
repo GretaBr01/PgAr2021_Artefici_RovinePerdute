@@ -13,7 +13,7 @@ public class Grafo {
 	private double matrice_adiacenza[][];
 	
 	private ArrayList<Integer> percorso_minimo=null;
-	private double costo_tot;
+	private double costo_tot = Double.MAX_VALUE;
 	
 	private int id_arrivo_percorso;
 	private int id_partenza_percorso;
@@ -26,6 +26,25 @@ public class Grafo {
 		
 		id_partenza_percorso=nodi.get(0).getId();
 		id_arrivo_percorso=nodi.get(numero_nodi-1).getId();
+	}
+	
+	public double getCosto_tot() {
+		return costo_tot;
+	}
+	
+	public ArrayList<Integer> getPercorso_minimo() {
+		return percorso_minimo;
+	}
+	
+	public String getNameByIndex (int id) {
+		String nomeCitta = nodi.get(id).getNome();
+		
+		return nomeCitta;
+	}
+	
+	public int getId (int i) {
+		int id = percorso_minimo.get(i);
+		return id;
 	}
 
 	public ArrayList<Citta> getNodi() {
@@ -90,7 +109,7 @@ public class Grafo {
 		}
 	}
 //****************************************************************************************************************************	
-	
+//iterazione	
 	public void calcolaPercorsoMinimo() {
 		ArrayList<Integer> percorso_parziale = new ArrayList<>();
 		boolean per = ricorsione(nodi.get(0), percorso_parziale);
@@ -117,43 +136,64 @@ public class Grafo {
 		int id_nuova_partenza = 0;
 		boolean trovato_arrivo=false;
 		
+		double costo_parziale = 0;
+		
+		
 		while (!fine_ricerca) {
 			trovato_arrivo=false;
+			////costo_parziale = calcolaCosto(percorso_parziale);
 			num_link_visitato_di_partenza= partenza.getNum_links_visitati();
 			if(partenza.getId()!=id_arrivo_percorso && partenza.getId()!=id_partenza_percorso) {	//non iserisce due volte la stessa citta nel percorso
-				if(percorso_parziale.get(percorso_parziale.size()-1) != partenza.getId()) {
-					percorso_parziale.add(partenza.getId());
-				}
-				
-				while(!trovato_arrivo && num_link_visitato_di_partenza < partenza.getNum_links()){	//prossima citta da visitare
-					id_nuova_partenza=partenza.getLinkByIndex(num_link_visitato_di_partenza);
+				if(costo_parziale <= costo_tot) {
 					
-					partenza.aggiornaNum_links_visitati();
-					num_link_visitato_di_partenza = partenza.getNum_links_visitati();
+					if(percorso_parziale.get(percorso_parziale.size()-1) != partenza.getId()) {
+						percorso_parziale.add(partenza.getId());
+						costo_parziale = costo_parziale + matrice_adiacenza[percorso_parziale.get(percorso_parziale.size() - 2)][percorso_parziale.get(percorso_parziale.size() - 1)];
+					}
 					
-					if(!giaVisitata(percorso_parziale, id_nuova_partenza)) {
-						trovato_arrivo=true;
-					}				
+					while(!trovato_arrivo && num_link_visitato_di_partenza < partenza.getNum_links()){	//prossima citta da visitare
+						id_nuova_partenza=partenza.getLinkByIndex(num_link_visitato_di_partenza);
+						
+						partenza.aggiornaNum_links_visitati();
+						num_link_visitato_di_partenza = partenza.getNum_links_visitati();
+						
+						if(!giaVisitata(percorso_parziale, id_nuova_partenza)) {
+							trovato_arrivo=true;
+						}				
+					}
+					
+					if(trovato_arrivo) {
+						nuova_partenza=nodi.get(id_nuova_partenza);
+						//costo_parziale = costo_parziale + matrice_adiacenza[partenza.getId()][nuova_partenza.getId()];
+						//costo_parziale = calcolaCosto(percorso_parziale);
+					}else {
+						//costo_parziale = costo_parziale - matrice_adiacenza[percorso_parziale.get(percorso_parziale.size() - 2)][percorso_parziale.get(percorso_parziale.size() - 1)];
+						percorso_parziale.remove(percorso_parziale.size()-1);	//se non e' stata trovata una nuova citta da visitare torna al passo precedente
+						costo_parziale = calcolaCosto(percorso_parziale);
+						partenza.resetNum_links_visitati();
+						id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
+						nuova_partenza=nodi.get(id_nuova_partenza);				
+					}
+				} else {
+					if(percorso_parziale.size()>=2) {
+						//costo_parziale = costo_parziale - matrice_adiacenza[percorso_parziale.get(percorso_parziale.size() - 2)][percorso_parziale.get(percorso_parziale.size() - 1)];
+						percorso_parziale.remove(percorso_parziale.size()-1);	//se non e' stata trovata una nuova citta da visitare torna al passo precedente
+						costo_parziale = calcolaCosto(percorso_parziale);
+						partenza.resetNum_links_visitati();
+						id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
+						nuova_partenza=nodi.get(id_nuova_partenza);		
+					}
 				}
-				
-				if(trovato_arrivo) {
-					nuova_partenza=nodi.get(id_nuova_partenza);				
-				}else {
-					percorso_parziale.remove(percorso_parziale.size()-1);	//se non e' stata trovata una nuova citta da visitare torna al passo precedente
-					partenza.resetNum_links_visitati();
-					id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
-					nuova_partenza=nodi.get(id_nuova_partenza);				
-				}				
 			}else if(partenza.getId()==id_arrivo_percorso) {	//scelta percorso minimo
 				percorso_parziale.add(partenza.getId());
-				
+				costo_parziale = costo_parziale + matrice_adiacenza[percorso_parziale.get(percorso_parziale.size() - 2)][percorso_parziale.get(percorso_parziale.size() - 1)];
 				if(Objects.isNull(percorso_minimo)){
 					percorso_minimo = new ArrayList<>();
 					setPercorso_minimo(percorso_parziale);
-					costo_tot = calcolaCosto(percorso_minimo);
+					costo_tot = costo_parziale;
 					
 				}else {
-					double costo_parziale=	calcolaCosto(percorso_parziale);				
+									
 					if(costo_parziale < costo_tot) {
 						setPercorso_minimo(percorso_parziale);
 						costo_tot=costo_parziale;
@@ -173,18 +213,24 @@ public class Grafo {
 					}
 				}
 				
+				//costo_parziale = costo_parziale - matrice_adiacenza[percorso_parziale.get(percorso_parziale.size() - 2)][percorso_parziale.get(percorso_parziale.size() - 1)];
 				percorso_parziale.remove(percorso_parziale.size()-1);
+				costo_parziale = calcolaCosto(percorso_parziale);
 				//partenza.resetNum_links_visitati();
 				id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
-				nuova_partenza=nodi.get(id_nuova_partenza);				
+				nuova_partenza=nodi.get(id_nuova_partenza);	
 			}else if(partenza.getId() == id_partenza_percorso) {
 				if(percorso_parziale.isEmpty()) {
 					percorso_parziale.add(partenza.getId());
 				}
+				costo_parziale = calcolaCosto(percorso_parziale);
 				if(num_link_visitato_di_partenza < partenza.getNum_links()) {
+					//costo_parziale = 0;
 					id_nuova_partenza = partenza.getLinkByIndex(num_link_visitato_di_partenza);
 					nuova_partenza = nodi.get(id_nuova_partenza);
 					partenza.aggiornaNum_links_visitati();
+					//costo_parziale = costo_parziale + matrice_adiacenza[partenza.getId()][nuova_partenza.getId()];
+					//costo_parziale = calcolaCosto(percorso_parziale);
 				}else {
 					fine_ricerca=true;
 				}
@@ -193,6 +239,24 @@ public class Grafo {
 		}
 	}
 	
+	
+	
+	
+	/*public void percorsoMinimoMatrice() {
+		ArrayList<Integer> percorso_parziale= new ArrayList<>();
+		int partenza = nodi.get(id_partenza_percorso).getId();
+		int num_link_visitato_di_partenza= partenza.getNum_links_visitati();
+		boolean fine_ricerca=false;		
+		
+		Citta nuova_partenza = null;
+		int id_nuova_partenza = 0;
+		boolean trovato_arrivo=false;
+	}*/
+	
+	
+	
+/*******************************************************************************************************************************************/
+//ricorsione	
 	public boolean ricorsione(Citta partenza, ArrayList<Integer> percorso_parziale) {
 		int num_link_visitato_di_partenza = partenza.getNum_links_visitati();
 		int id_nuova_partenza = 0;
@@ -250,6 +314,8 @@ public class Grafo {
 						if(isIdMaggiorePercorso(percorso_parziale, percorso_minimo)) {
 							setPercorso_minimo(percorso_parziale);
 							costo_tot=costo_parziale;
+						} else {
+							
 						}
 					}
 				}
@@ -283,7 +349,7 @@ public class Grafo {
 	public boolean isIdMaggiorePercorso(ArrayList<Integer> percorso_parziale, ArrayList<Integer> percorso_minimo){
 		//riordino array e faccio altro
 		Integer[] array_percorso_parziale= percorso_parziale.toArray(new Integer[percorso_parziale.size()]);
-		Integer[] array_percorso_minimo= percorso_parziale.toArray(new Integer[percorso_minimo.size()]);
+		Integer[] array_percorso_minimo= percorso_minimo.toArray(new Integer[percorso_minimo.size()]);
 		
 		Arrays.sort(array_percorso_minimo); 
 		Arrays.sort(array_percorso_parziale);
@@ -291,7 +357,7 @@ public class Grafo {
 		for(int i=array_percorso_minimo.length-1; i>=0; i--) {
 			if(array_percorso_minimo[i]-array_percorso_parziale[i] < 0) {
 				return true;
-			}
+			}else if(array_percorso_minimo[i]-array_percorso_parziale[i] > 0) return false;
 		}		
 		return false;
 	}
@@ -314,6 +380,10 @@ public class Grafo {
 			percorso_minimo.add(percorso_minimo_scelto.get(i));
 		}
 	}
+	
+	/*public void setCosto() {
+		this.costo_tot = calcolaCosto(percorso_minimo);
+	}*/
 	
 	
 	
