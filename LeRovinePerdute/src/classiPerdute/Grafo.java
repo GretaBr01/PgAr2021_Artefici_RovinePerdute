@@ -28,6 +28,25 @@ public class Grafo {
 		id_arrivo_percorso=nodi.get(numero_nodi-1).getId();
 	}
 
+	public ArrayList<Integer> getPercorso_minimo() {
+		return percorso_minimo;
+	}
+
+	public double getCosto_tot() {
+		return costo_tot;
+	}
+	
+	public String getNameByIndex (int id) {
+		String nomeCitta = nodi.get(id).getNome();
+		
+		return nomeCitta;
+	}
+	
+	public int getId (int i) {
+		int id = percorso_minimo.get(i);
+		return id;
+	}
+
 	public ArrayList<Citta> getNodi() {
 		return nodi;
 	}
@@ -306,7 +325,7 @@ public class Grafo {
 		}
 		
 		return costo;
-	}	
+	}
 	
 	public void setPercorso_minimo(ArrayList<Integer> percorso_minimo_scelto){
 		percorso_minimo.clear();

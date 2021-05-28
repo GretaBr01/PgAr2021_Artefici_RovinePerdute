@@ -67,7 +67,7 @@ public class Citta {
 
 	/**
 	 * aggiunge alla lista dei collegamenti della citta' l'id delle citta' a cui essa e' collegata
-	 * @param linked_id_city id della citta'  collegata
+	 * @param linked_id_city id della citta'ï¿½ collegata
 	 */
 	public void addLink (int linked_id_city) {
 		links.add(linked_id_city);
@@ -107,7 +107,5 @@ public class Citta {
 		
 		return peso;
 	}
-	
-	
 
 }
