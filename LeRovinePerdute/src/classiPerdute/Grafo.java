@@ -107,6 +107,92 @@ public class Grafo {
 		return false;
 	}
 	
+	public void trovaPercorsoMinimo() {
+		ArrayList<Integer> percorso_parziale= new ArrayList<>();
+		Citta partenza = nodi.get(id_partenza_percorso);
+		int num_link_visitato_di_partenza= partenza.getNum_links_visitati();
+		boolean fine_ricerca=false;		
+		
+		Citta nuova_partenza = null;
+		int id_nuova_partenza = 0;
+		boolean trovato_arrivo=false;
+		
+		while (!fine_ricerca) {
+			trovato_arrivo=false;
+			num_link_visitato_di_partenza= partenza.getNum_links_visitati();
+			if(partenza.getId()!=id_arrivo_percorso && partenza.getId()!=id_partenza_percorso) {	//non iserisce due volte la stessa citta nel percorso
+				if(percorso_parziale.get(percorso_parziale.size()-1) != partenza.getId()) {
+					percorso_parziale.add(partenza.getId());
+				}
+				
+				while(!trovato_arrivo && num_link_visitato_di_partenza < partenza.getNum_links()){	//prossima citta da visitare
+					id_nuova_partenza=partenza.getLinkByIndex(num_link_visitato_di_partenza);
+					
+					partenza.aggiornaNum_links_visitati();
+					num_link_visitato_di_partenza = partenza.getNum_links_visitati();
+					
+					if(!giaVisitata(percorso_parziale, id_nuova_partenza)) {
+						trovato_arrivo=true;
+					}				
+				}
+				
+				if(trovato_arrivo) {
+					nuova_partenza=nodi.get(id_nuova_partenza);				
+				}else {
+					percorso_parziale.remove(percorso_parziale.size()-1);	//se non e' stata trovata una nuova citta da visitare torna al passo precedente
+					partenza.resetNum_links_visitati();
+					id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
+					nuova_partenza=nodi.get(id_nuova_partenza);				
+				}				
+			}else if(partenza.getId()==id_arrivo_percorso) {	//scelta percorso minimo
+				percorso_parziale.add(partenza.getId());
+				
+				if(Objects.isNull(percorso_minimo)){
+					percorso_minimo = new ArrayList<>();
+					setPercorso_minimo(percorso_parziale);
+					costo_tot = calcolaCosto(percorso_minimo);
+					
+				}else {
+					double costo_parziale=	calcolaCosto(percorso_parziale);				
+					if(costo_parziale < costo_tot) {
+						setPercorso_minimo(percorso_parziale);
+						costo_tot=costo_parziale;
+						
+					}else if(Math.abs(costo_parziale-costo_tot) <= EPSILON) {
+						
+						if(percorso_parziale.size() < percorso_minimo.size()) {
+							setPercorso_minimo(percorso_parziale);
+							costo_tot=costo_parziale;
+							
+						}else if(percorso_parziale.size() == percorso_minimo.size()) {
+							if(isIdMaggiorePercorso(percorso_parziale, percorso_minimo)) {
+								setPercorso_minimo(percorso_parziale);
+								costo_tot=costo_parziale;
+							}
+						}
+					}
+				}
+				
+				percorso_parziale.remove(percorso_parziale.size()-1);
+				//partenza.resetNum_links_visitati();
+				id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
+				nuova_partenza=nodi.get(id_nuova_partenza);				
+			}else if(partenza.getId() == id_partenza_percorso) {
+				if(percorso_parziale.isEmpty()) {
+					percorso_parziale.add(partenza.getId());
+				}
+				if(num_link_visitato_di_partenza < partenza.getNum_links()) {
+					id_nuova_partenza = partenza.getLinkByIndex(num_link_visitato_di_partenza);
+					nuova_partenza = nodi.get(id_nuova_partenza);
+					partenza.aggiornaNum_links_visitati();
+				}else {
+					fine_ricerca=true;
+				}
+			}
+			partenza=nuova_partenza;
+		}
+	}
+	
 	public boolean ricorsione(Citta partenza, ArrayList<Integer> percorso_parziale) {
 		int num_link_visitato_di_partenza = partenza.getNum_links_visitati();
 		int id_nuova_partenza = 0;
@@ -220,13 +306,7 @@ public class Grafo {
 		}
 		
 		return costo;
-	}
-	
-	public void trovaPercorsoMinimo() {
-		int indice_partenza = nodi.get(0).getId();
-		int indice_arrivo = nodi.get(numero_nodi-1).getId();
-	}
-	
+	}	
 	
 	public void setPercorso_minimo(ArrayList<Integer> percorso_minimo_scelto){
 		percorso_minimo.clear();
