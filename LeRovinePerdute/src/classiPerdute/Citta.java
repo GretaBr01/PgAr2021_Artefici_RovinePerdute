@@ -13,54 +13,99 @@ public class Citta {
 	private int num_links=0;
 	private int num_links_visitati=0;
 
+	/**
+	 * @return stringa corrispondente all'id della persona
+	 */
 	public int getId() {
 		return id;
 	}
-
+	
+	/**
+	 * set id della persona
+	 * @param string
+	 */
 	public void setId(int id) {
 		this.id = id;
 	}
-
+	
+	/**
+	 * @return stringa corrispondente al nome della persona
+	 */
 	public String getNome() {
 		return nome;
 	}
-
+	
+	/**
+	 * set nome della persona
+	 * @param nome
+	 */
 	public void setNome(String nome) {
 		this.nome = nome;
 	}
 
+	/**
+	 * @return coordinata x della citta
+	 */
 	public double getX() {
 		return x;
 	}
 
+	/**
+	 * set coordinata x della citta
+	 * @param x
+	 */
 	public void setX(double x) {
 		this.x = x;
 	}
-
+	
+	/**
+	 * @return coordinata y della citta
+	 */
 	public double getY() {
 		return y;
 	}
-
+	
+	/**
+	 * set coordinata y della citta
+	 * @param y
+	 */
 	public void setY(double y) {
 		this.y = y;
 	}
-
+	
+	/**
+	 * @return altezza sul livello del mare della citta
+	 */
 	public double getH() {
 		return h;
 	}
 
+	/**
+	 * set altezza sul livello del mare della citta
+	 * @param h
+	 */
 	public void setH(double h) {
 		this.h = h;
 	}
 	
+	/**
+	 * 
+	 * @return numero dei collegamenti gia' controllati della relativa citta
+	 */
 	public int getNum_links_visitati() {
 		return num_links_visitati;
 	}
 
+	/**
+	 * aggiornamento del numero dei collegamenti gia' controllati della relativa citta
+	 */
 	public void aggiornaNum_links_visitati() {
 		this.num_links_visitati++;
 	}
 	
+	/**
+	 * reimposto a 0 il numero dei collegamenti gia' controllati della relativa citta
+	 */
 	public void resetNum_links_visitati() {
 		this.num_links_visitati=0;
 	}
@@ -74,12 +119,19 @@ public class Citta {
 		num_links++;
 	}
 	
-	
-	
+	/**
+	 * 
+	 * @return il numero dei collegamenti della citta relativa
+	 */
 	public int getNum_links() {
 		return num_links;
 	}
 	
+	/**
+	 * prendere l'id della citta a cui e' collegata sapento il rispettivo indice dell'ArrayList "links" 
+	 * @param i indice a cui si vuole prendere il link
+	 * @return l'id della citta a cui e' collegata
+	 */
 	public int getLinkByIndex(int i) {
 		return links.get(i);
 	}

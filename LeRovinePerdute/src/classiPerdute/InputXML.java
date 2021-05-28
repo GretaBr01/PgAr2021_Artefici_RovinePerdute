@@ -16,9 +16,6 @@ public class InputXML {
 	private static final String TAG_LINK = "link";
 	private static final String ERRORE_READER = "Errore nell'inizializzazione del reader:";
 	
-	
-	
-
 
 	/** 
 	 * lettura del file passato come argomento e creazione di un'ArrayList contenente le informazioni ricavate 
