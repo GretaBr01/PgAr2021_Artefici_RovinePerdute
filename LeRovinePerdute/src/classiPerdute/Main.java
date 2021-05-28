@@ -13,8 +13,8 @@ public class Main {
 
 	public static void main(String[] args) {
 		System.out.println("elaborazione in corso...");
-		Grafo T= new Grafo("Tonatiuh", InputXML.leggiXMLCitta(INPUT_XML_5));
-		Grafo M= new Grafo("Metztli", InputXML.leggiXMLCitta(INPUT_XML_5));
+		Grafo T= new Grafo("Tonatiuh", InputXML.leggiXMLCitta(INPUT_XML_50));
+		Grafo M= new Grafo("Metztli", InputXML.leggiXMLCitta(INPUT_XML_50));
 		T.calcolaGrafoPesato();
 		M.calcolaGrafoPesato();
 		T.trovaPercorsoMinimo();
