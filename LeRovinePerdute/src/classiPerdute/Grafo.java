@@ -12,8 +12,6 @@ public class Grafo {
 	private ArrayList<Citta> nodi=new ArrayList<Citta>();
 	private double matrice_adiacenza[][];
 	
-	private double[][] matrice_distanze= new double[numero_nodi][numero_nodi];
-	
 	private ArrayList<Integer> percorso_minimo=null;
 	private double costo_tot;
 	
@@ -43,8 +41,6 @@ public class Grafo {
 	}
 	
 	public void calcolaGrafoPesato() {
-		
-		//annullaMatrice_adiacenza();
 		
 		Citta citta_partenza;
 		Citta citta_arrivo;
@@ -86,45 +82,6 @@ public class Grafo {
 		}
 	}
 //*************************************************************************************************************************
-	public int minDistance(ArrayList<Double> mindist, ArrayList<Boolean> visited){
-	    double min=Double.MAX_VALUE;
-	    int minindex=-1;
-	    for (int i=0; i < mindist.size(); i++) {
-	        if(!visited.get(i) && (mindist.get(i) <=min)) {
-	            min=mindist.get(i);
-	            minindex=i;
-	        }
-	    }
-	    return minindex;
-	}
-	
-	public double dijkstra(int start, int end) {
-	    int computers=matrice_adiacenza.length;
-	    ArrayList<Boolean> traversed=new ArrayList<>(); //Hold traversed nodes
-	    for (int i=0; i < computers; i++) {
-	        traversed.add(i,false);
-	    }
-	    ArrayList<Double> mindist=new ArrayList<>(); //Holds mindistances to nodes based on index
-	    for (int i=0; i < computers; i++) {
-	        mindist.add(i,Double.MAX_VALUE);
-	    }
-	    mindist.set(start,(double)0);
-
-	    for (int i=0; i < computers; i++) {
-	        int min=minDistance(mindist,traversed);
-	        if(min==-1) return mindist.get(end);
-	        traversed.set(min,true);
-	        if(min==end) return mindist.get(min)==Double.MAX_VALUE ? -1 : mindist.get(min); //Error check
-	        for (int j=0; j < computers; j++) {
-	            if(!traversed.get(j) && matrice_adiacenza[min][j] !=0 && mindist.get(min) + matrice_adiacenza[min][j] < mindist.get(j)) {
-		                mindist.set(j,(mindist.get(min) + matrice_adiacenza[min][j]));
-		            }
-	        }
-	    }
-	    stampaPercorso(traversed);
-	    return mindist.get(end)==Double.MAX_VALUE ? -1 : mindist.get(end);
-	}
-	
 	public void stampaPercorso(ArrayList<Boolean> visited) {
 		for(int i=0; i<visited.size(); i++) {
 			if(visited.get(i)) {
@@ -176,12 +133,13 @@ public class Grafo {
 				nuova_Partenza=nodi.get(id_nuova_partenza);				
 			}else {
 				percorso_parziale.remove(percorso_parziale.size()-1);
+				partenza.resetNum_links_visitati();
 				id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
 				nuova_Partenza=nodi.get(id_nuova_partenza);				
 			}
 				
 			ricorsione(nuova_Partenza, percorso_parziale);
-			
+			return true;
 		}else if(partenza.getId()==id_arrivo_percorso) {	//scelta percorso minimo
 			percorso_parziale.add(partenza.getId());
 			
@@ -212,10 +170,12 @@ public class Grafo {
 			}
 			
 			percorso_parziale.remove(percorso_parziale.size()-1);
+			//partenza.resetNum_links_visitati();
 			id_nuova_partenza=percorso_parziale.get(percorso_parziale.size()-1);
 			nuova_Partenza=nodi.get(id_nuova_partenza);
 			
 			ricorsione(nuova_Partenza,percorso_parziale);
+			return true;
 			
 		}else if(partenza.getId() == id_partenza_percorso) {
 			if(percorso_parziale.isEmpty()) {
@@ -226,6 +186,7 @@ public class Grafo {
 				nuova_Partenza = nodi.get(id_nuova_partenza);
 				partenza.aggiornaNum_links_visitati();
 				ricorsione(nuova_Partenza, percorso_parziale);
+				return true;
 			}else {
 				return true;
 			}
@@ -262,15 +223,13 @@ public class Grafo {
 	}
 	
 	public void trovaPercorsoMinimo() {
-		
 		int indice_partenza = nodi.get(0).getId();
 		int indice_arrivo = nodi.get(numero_nodi-1).getId();
-		
-		
 	}
 	
 	
 	public void setPercorso_minimo(ArrayList<Integer> percorso_minimo_scelto){
+		percorso_minimo.clear();
 		for(int i=0; i<percorso_minimo_scelto.size(); i++) {
 			percorso_minimo.add(percorso_minimo_scelto.get(i));
 		}

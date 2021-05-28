@@ -60,6 +60,10 @@ public class Citta {
 	public void aggiornaNum_links_visitati() {
 		this.num_links_visitati++;
 	}
+	
+	public void resetNum_links_visitati() {
+		this.num_links_visitati=0;
+	}
 
 	/**
 	 * aggiunge alla lista dei collegamenti della citta' l'id delle citta' a cui essa e' collegata
